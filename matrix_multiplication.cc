@@ -1,4 +1,5 @@
 
+#include <omp.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -22,12 +23,15 @@ int main(int argc, const char* argv[]) {
         }
     }
 
+    omp_set_num_threads(8);
+
     struct timeval start, end;
     gettimeofday(&start, NULL);
 
+    #pragma omp parallel for
     for(int i = 0; i < n; ++i) {
-        for(int j = 0; j < n; ++j) {
-            for(int k = 0; k < n; ++k) {
+        for(int k = 0; k < n; ++k) {
+            for(int j = 0; j < n; ++j) {
                 C[i][j] += A[i][k] * B[k][j];
             }
         }
