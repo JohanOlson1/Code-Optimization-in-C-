@@ -5,6 +5,6 @@ find_package(OpenMP)
 
 set(CMAKE_CXX_FLAGS "-O3")
 
-add_executable(Executable matrix_multiplication.cc)
+add_executable(Executable lecture_1_matrix_mul.cc)
 
 target_link_libraries(Executable PRIVATE OpenMP::OpenMP_CXX)
