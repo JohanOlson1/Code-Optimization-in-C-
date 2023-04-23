@@ -5,6 +5,13 @@
 #include <chrono>
 #include <iostream>
 
+#include "ipps.h"
+#include "mkl.h"
+
+#define n 4096
+double A[n][n];
+double B[n][n];
+double C[n][n];
 
 int main() {
     for(int i = 0; i < n; ++i) {
@@ -15,44 +22,19 @@ int main() {
         }
     }
 
-    // 1. Start
     auto start = std::chrono::steady_clock::now();
-    naiveApproach();
+    // naiveApproach();
+    // loopOrder();
+    // optimizationFlag();
+    // parallelization();
+    // tiling();
+    vectorization();
+    // intelMKL(); // Intel MKL
     auto finish = std::chrono::steady_clock::now();
-    double elapsed_time_1 = std::chrono::duration<double, std::milli>(finish - start).count();
-    std::cout << "1. Start: " << elapsed_time_1 << " ms\n";
+    double elapsed_time = std::chrono::duration<double, std::milli>(finish - start).count();
+    std::cout << "Runtime: " << elapsed_time << " ms\n";
 
-    // 2.  Loop order
-    start = std::chrono::steady_clock::now();
-    loopOrder();
-    finish = std::chrono::steady_clock::now();
-    auto elapsed_time_2 = std::chrono::duration<double, std::milli>(finish - start).count();
-    std::cout << "2. Loop order: " << elapsed_time_2 << " ms" 
-              << " Relative speedup: " << elapsed_time_1/elapsed_time_2 << "\n";
-
-    // 3. Optimization flag
-    start = std::chrono::steady_clock::now();
-    optimizationFlag();
-    finish = std::chrono::steady_clock::now();
-    auto elapsed_time_3 = std::chrono::duration<double, std::milli>(finish - start).count();
-    std::cout << "3. Optimization flag: " << elapsed_time_3 << " ms" 
-              << " Relative speedup: " << elapsed_time_2/elapsed_time_3 << "\n";
-
-    // 4. Parallelization
-    start = std::chrono::steady_clock::now();
-    parallelization();
-    finish = std::chrono::steady_clock::now();
-    auto elapsed_time_4 = std::chrono::duration<double, std::milli>(finish - start).count();
-    std::cout << "4. Parallel 8 threads: " << elapsed_time_4 << " ms" 
-              << " Relative speedup: " << elapsed_time_3/elapsed_time_4 << "\n";
-
-    // 5. Tiling
-    start = std::chrono::steady_clock::now();
-    tiling();
-    finish = std::chrono::steady_clock::now();
-    auto elapsed_time_5 = std::chrono::duration<double, std::milli>(finish - start).count();
-    std::cout << "5. Tiling: " << elapsed_time_5 << " ms" 
-              << " Relative speedup: " << elapsed_time_4/elapsed_time_5 << "\n";
+    return 0;
 }
 
 #pragma GCC optimize("O0")
@@ -91,9 +73,7 @@ void optimizationFlag() {
 #pragma GCC optimize("O3")
 void parallelization() {
 
-    int N_threads{omp_get_max_threads()};
-
-    #pragma omp parallel for num_threads(N_threads)
+    #pragma omp parallel for schedule(dynamic) num_threads(omp_get_max_threads())
     for(int i = 0; i < n; ++i) {
         for(int k = 0; k < n; ++k) {
             for(int j = 0; j < n; ++j) {
@@ -105,7 +85,7 @@ void parallelization() {
 
 #pragma GCC optimize("O3")
 void tiling() {
-    int s{32};
+    int s{64};
 
     omp_set_num_threads(omp_get_max_threads());
 
@@ -124,4 +104,34 @@ void tiling() {
             }
         }
     }
+}
+
+// O3 flag does vectorization well, adds all the neccessary flags
+#pragma GCC optimize("O3")
+void vectorization() {
+    
+    int s{64};
+
+    omp_set_num_threads(omp_get_max_threads());
+
+    #pragma omp parallel for
+    for(int ih = 0; ih < n; ih += s) {
+        #pragma omp parallel for
+        for(int jh = 0; jh < n; jh += s) {
+            for(int kh = 0; kh < n; kh += s) {
+                for(int il = 0; il < s; ++il) {
+                    for(int kl = 0; kl < s; ++kl) {
+                        for(int jl = 0; jl < s; ++jl) {
+                            C[ih+il][jh+jl] += A[ih+il][kh+kl] * B[kh+kl][jh+jl];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void intelMKL() {
+    mkl_set_num_threads(1);
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1, &A[0][0], n, &B[0][0], n, 0, &C[0][0], n);
 }
