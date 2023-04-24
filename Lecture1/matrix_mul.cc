@@ -1,4 +1,4 @@
-#include "lecture_1_matrix_mul.h"
+#include "matrix_mul.h"
 
 #include <omp.h>
 
@@ -27,8 +27,8 @@ int main() {
     // loopOrder();
     // optimizationFlag();
     // parallelization();
-    // tiling();
-    vectorization();
+    tiling();
+    // vectorization();
     // intelMKL(); // Intel MKL
     auto finish = std::chrono::steady_clock::now();
     double elapsed_time = std::chrono::duration<double, std::milli>(finish - start).count();
