@@ -4,3 +4,4 @@ project(CodeOptimization VERSION 0.1.0)
 set(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -march=native")
 
 add_subdirectory(Lecture1)
+add_subdirectory(Lecture6)

@@ -27,9 +27,9 @@ int main() {
     // loopOrder();
     // optimizationFlag();
     // parallelization();
-    tiling();
+    // tiling();
     // vectorization();
-    // intelMKL(); // Intel MKL
+    intelMKL(); // Intel MKL
     auto finish = std::chrono::steady_clock::now();
     double elapsed_time = std::chrono::duration<double, std::milli>(finish - start).count();
     std::cout << "Runtime: " << elapsed_time << " ms\n";
@@ -132,6 +132,8 @@ void vectorization() {
 }
 
 void intelMKL() {
-    mkl_set_num_threads(1);
+    // omp_set_num_threads(1);
+    // mkl_set_num_threads(1);
+    mkl_set_num_threads_local(1);
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1, &A[0][0], n, &B[0][0], n, 0, &C[0][0], n);
 }
