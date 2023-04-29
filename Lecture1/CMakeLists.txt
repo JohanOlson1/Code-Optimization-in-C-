@@ -1,9 +1,8 @@
-add_executable(Executable matrix_mul.cc)
+add_executable(lecture1 src/matrix_mul.cc)
 
-find_package(OpenMP)
-find_package(IPP)
-find_package(MKL)
-target_link_libraries(Executable    PRIVATE 
+target_include_directories(lecture1 PUBLIC include)
+
+target_link_libraries(lecture1      PRIVATE
                                     OpenMP::OpenMP_CXX
                                     IPP::ippcore IPP::ipps IPP::ippi IPP::ippcv
                                     MKL::MKL)

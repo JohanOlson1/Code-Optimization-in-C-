@@ -1,5 +1,6 @@
-add_executable(Lecture6 main.cc)
+add_executable(lecture6 src/main.cc)
 
-find_package(OpenMP)
-target_link_libraries(Lecture6  PRIVATE 
+target_include_directories(lecture6 PUBLIC include)
+
+target_link_libraries(lecture6  PRIVATE 
                                 OpenMP::OpenMP_CXX)
