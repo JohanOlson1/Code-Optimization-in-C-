@@ -1,4 +1,4 @@
-add_executable(lecture6 src/main.cc)
+add_executable(lecture6 src/parallelization.cc)
 
 target_include_directories(lecture6 PUBLIC include)
 

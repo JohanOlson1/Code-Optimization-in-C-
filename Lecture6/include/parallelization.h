@@ -6,14 +6,16 @@ typedef struct {
     int output;
 } thread_args;
 
-void openMPParallel(const int n);
+void OpenmpParallel(const int n);
 
-void cppParallel(const int n);
+void CppParallel(const int n);
 
 void pthreadParallelFib(const int n);
 
-int fib(int n);
+int Fib(int n);
 
-void* threadFunc(void* ptr);
+void FibNoThreading(const int n);
+
+void* ThreadFunc(void* ptr);
 
 #endif // LECTURE_6_MAIN_H
